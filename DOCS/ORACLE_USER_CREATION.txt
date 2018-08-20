@@ -1,0 +1,49 @@
+nstalled    - d:\oraclexe
+
+SYS + SYSTEM password - admin123
+
+   parameters:
+
+        Destination Folder: D:\oraclexe\
+
+                Oracle Home: D:\oraclexe\app\oracle\product\11.2.0\server\
+
+                Oracle Base:D:\oraclexe\
+
+                Port for 'Oracle Database Listener': 1521
+
+                Port for 'Oracle Services for Microsoft Transaction Server': 2030
+
+                Port for 'Oracle HTTP Listener': 8080
+
+  sqlplus path: D:\oraclexe\app\oracle\product\11.2.0\server\bin\sqlplus
+
+ 
+
+some sql commands:
+
+------------------
+
+ 
+
+select owner, table_name from SYS.ALL_TABLES order by owner,table_name;
+
+select owner, table_name from SYS.ALL_TABLES where owner ='SYSTEM'; -- SYS
+
+select tablespace_name dba_tablespaces;
+
+ 
+
+select * from dba_users;
+
+CREATE USER test1 IDENTIFIED BY test2;
+
+GRANT RESOURCE TO test2;
+
+GRANT CONNECT TO test2;
+
+GRANT CREATE VIEW TO test2;
+
+GRANT CREATE SESSION TO test2;
+
+GRANT UNLIMITED TABLESPACE TO test2;
