@@ -1,14 +1,11 @@
 package com.nt.portal.services.impl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -39,15 +36,14 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 	private BCryptPasswordEncoder bcryptEncoder;
 
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userDao.findByUsername(username);
+		User user = userDao.findByuserName(username);
 		if (user == null) {
 			throw new UsernameNotFoundException("Invalid username or password.");
 		}
-		return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(),
-				getAuthority(user));
+		return user;
 	}
 
-	private Set<SimpleGrantedAuthority> getAuthority(User user) {
+	/*private Set<SimpleGrantedAuthority> getAuthority(User user) {
 		Set<SimpleGrantedAuthority> authorities = new HashSet<>();
 		user.getRoles().forEach(role -> {
 			// authorities.add(new SimpleGrantedAuthority(role.getName()));
@@ -55,7 +51,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 		});
 		return authorities;
 		// return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
-	}
+	}*/
 
 	public List<User> findAll() {
 		List<User> list = new ArrayList<>();
@@ -70,7 +66,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
 	@Override
 	public User findOne(String username) {
-		return userDao.findByUsername(username);
+		return userDao.findByuserName(username);
 	}
 
 	@Override
