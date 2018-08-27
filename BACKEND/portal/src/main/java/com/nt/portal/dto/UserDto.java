@@ -1,7 +1,15 @@
 package com.nt.portal.dto;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * DTO class for holding User Data
@@ -10,7 +18,18 @@ import java.util.Date;
  * @version 1.0
  *
  */
-public class UserDto implements Serializable {
+public class UserDto implements Serializable, UserDetails {
+
+	public UserDto() {
+	}
+
+	public UserDto(String userName, long id, String token, List<GrantedAuthority> grantedAuthorities) {
+
+		this.userName = userName;
+		this.id = id;
+		this.token = token;
+		/* getAuthorities(); */
+	}
 
 	/**
 	 * Serial Version ID
@@ -26,6 +45,9 @@ public class UserDto implements Serializable {
 	private String formattedCreatedOn;
 	private Date updatedOn;
 	private String formattedUpdatedOn;
+	private Set<RoleDto> roles;
+	private Long id;
+	private String token;
 
 	/**
 	 * @return the firstName
@@ -163,10 +185,89 @@ public class UserDto implements Serializable {
 	}
 
 	/**
-	 * @return the serialversionuid
+	 * @return the roles
 	 */
-	public static long getSerialversionuid() {
-		return serialVersionUID;
+	public Set<RoleDto> getRoles() {
+		return roles;
+	}
+
+	/**
+	 * @param roles
+	 *            the roles to set
+	 */
+	public void setRoles(Set<RoleDto> roles) {
+		this.roles = roles;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the token
+	 */
+	public String getToken() {
+		return token;
+	}
+
+	/**
+	 * @param token
+	 *            the token to set
+	 */
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+		this.roles.forEach(role -> {
+			authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
+			authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
+		});
+		return authorities;
+		/* return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")); */
+	}
+
+	@Override
+	public String getUsername() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

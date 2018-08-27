@@ -1,8 +1,6 @@
 package com.nt.portal.model;
 
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -18,10 +16,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 /**
  * Model class for User
  * 
@@ -31,12 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 @Entity
 @Table(name = "NT_USERS")
-public class User implements UserDetails {
-
-	/**
-	 * Serial Version Id
-	 */
-	private static final long serialVersionUID = -3422174143814538375L;
+public class User {
 
 	@Id
 	@GeneratedValue(generator = "NT_USERS_SEQ", strategy = GenerationType.SEQUENCE)
@@ -203,46 +192,6 @@ public class User implements UserDetails {
 	 */
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
-	}
-
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-		this.roles.forEach(role -> {
-			// authorities.add(new SimpleGrantedAuthority(role.getName()));
-			authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
-		});
-		return authorities;
-		// return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
-	}
-
-	@Override
-	public String getUsername() {
-		return this.userName;
-	}
-
-	@Override
-	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.nt.portal.dto;
+package com.nt.portal.dto.common;
 
 /**
  * DTO for holding Constants

@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.nt.portal.converter.UserConverter;
 import com.nt.portal.dao.UserDao;
 import com.nt.portal.dto.UserDto;
 import com.nt.portal.model.User;
@@ -25,33 +25,19 @@ import com.nt.portal.services.UserService;
  *
  */
 @Service(value = "userService")
-public class UserServiceImpl implements UserDetailsService, UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
 	@Autowired
 	private UserDao userDao;
 
+	/*
+	 * @Autowired private BCryptPasswordEncoder bcryptEncoder;
+	 */
+
 	@Autowired
-	private BCryptPasswordEncoder bcryptEncoder;
-
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userDao.findByuserName(username);
-		if (user == null) {
-			throw new UsernameNotFoundException("Invalid username or password.");
-		}
-		return user;
-	}
-
-	/*private Set<SimpleGrantedAuthority> getAuthority(User user) {
-		Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-		user.getRoles().forEach(role -> {
-			// authorities.add(new SimpleGrantedAuthority(role.getName()));
-			authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
-		});
-		return authorities;
-		// return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
-	}*/
+	private UserConverter userConverter;
 
 	public List<User> findAll() {
 		List<User> list = new ArrayList<>();
@@ -81,8 +67,23 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 		newUser.setLastName(user.getLastName());
 		newUser.setUserName(user.getUserName());
 		LOGGER.debug("Unencrypted Password getting saved is ", user.getPassword());
-		newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
+		newUser.setPassword(user.getPassword());
+		/* newUser.setPassword(bcryptEncoder.encode(user.getPassword())); */
 		newUser.setEmail(user.getEmail());
 		return userDao.save(newUser);
+	}
+
+	/**
+	 * Spring Security method to load user by userName
+	 */
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		LOGGER.info("inside UserServiceImpl cmethod loadUserByUsername for username : {}", username);
+		User user = userDao.findByuserName(username);
+		if (null == user) {
+			LOGGER.debug("User Not Found by UserName: {}", username);
+			throw new UsernameNotFoundException("User does not exist by username " + username);
+		}
+		return userConverter.convert(user);
 	}
 }

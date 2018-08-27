@@ -2,10 +2,10 @@ package com.nt.portal.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 /**
- * Class for creating all configuration for the application
+ * Class for configuration for application
  * 
  * @author suhail.ahmad
  * @version 1.0
@@ -15,7 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class BaseConfig {
 
 	@Bean
-	public BCryptPasswordEncoder bcryptEncoder() {
-		return new BCryptPasswordEncoder();
+	public MappingJackson2HttpMessageConverter jsonMessageConverter() {
+		return new MappingJackson2HttpMessageConverter();
 	}
 }

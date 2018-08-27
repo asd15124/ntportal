@@ -1,34 +1,16 @@
-package com.nt.portal.model;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+package com.nt.portal.dto;
 
 /**
- * Model class for Roles
+ * DTO class for user roles
  * 
  * @author suhail.ahmad
  * @version 1.0
  *
  */
-@Entity
-@Table(name = "NT_ROLES")
-public class Role {
+public class RoleDto {
 
-	@Id
-	@GeneratedValue(generator = "NT_USERS_SEQ", strategy = GenerationType.SEQUENCE)
-	@SequenceGenerator(name = "NT_USERS_SEQ", initialValue = 1, sequenceName = "NT_USERS_SEQ", allocationSize = 5)
-	@Column(name = "ROLE_ID", nullable = false)
 	private Long roleId;
-
-	@Column(name = "ROLE_NAME", nullable = false)
 	private String roleName;
-
-	@Column(name = "ROLE_DESCRITION")
 	private String roleDescription;
 
 	/**
