@@ -1,6 +1,8 @@
 package com.nt.portal.security;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,7 +12,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.nt.portal.converter.RoleConverter;
+import com.nt.portal.dto.RoleDto;
 import com.nt.portal.dto.UserDto;
+import com.nt.portal.services.impl.UserServiceImpl;
 
 /**
  * Class for Authentication provider for JWT
@@ -25,10 +30,15 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 
+	@Autowired
+	private UserServiceImpl userService;
+
+	@Autowired
+	private RoleConverter roleConverter;
+
 	@Override
 	public boolean supports(Class<?> authentication) {
-
-		return (JwtAuthenticationToken.class.isAssignableFrom(authentication));
+		return (UserDto.class.isAssignableFrom(authentication));
 	}
 
 	@Override
@@ -41,17 +51,29 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
 	@Override
 	protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication)
 			throws AuthenticationException {
-		JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
+		UserDto jwtAuthenticationToken = (UserDto) authentication;
 		String token = jwtAuthenticationToken.getToken();
 
-		UserDto jwtUser = jwtTokenUtil.parseJWT(token);
+		String userName = jwtTokenUtil.getUsernameFromToken(token);
 
-		if (jwtUser == null) {
+		if (userName == null) {
 			throw new RuntimeException("JWT Token is incorrect");
 		}
 
-		List<GrantedAuthority> grantedAuthorities = (List<GrantedAuthority>) jwtUser.getAuthorities();
-		return new UserDto(jwtUser.getUserName(), jwtUser.getId(), token, grantedAuthorities);
+		UserDto userDetails = userService.loadUserByUsername(userName);
+
+		if (null == userDetails) {
+			throw new RuntimeException("JWT Token is incorrect");
+		}
+
+		Set<RoleDto> roles = userDetails.getRoles();
+		userDetails.setRoles(roles);
+		userDetails.setAuthorities(new ArrayList<RoleDto>(roles));
+
+		List<GrantedAuthority> grantedAuthorities = (List<GrantedAuthority>) userDetails.getAuthorities();
+
+		return new UserDto(userDetails.getUserName(), userDetails.getId(), token, userDetails.getPassword(),
+				grantedAuthorities);
 	}
 
 }

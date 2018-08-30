@@ -1,7 +1,5 @@
 package com.nt.portal.controller;
 
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nt.portal.converter.UserConverter;
 import com.nt.portal.dto.UserDto;
-import com.nt.portal.model.Role;
 import com.nt.portal.model.User;
 import com.nt.portal.security.JwtTokenUtil;
 import com.nt.portal.services.UserService;
@@ -36,9 +34,12 @@ public class AuthorizationController extends BaseController {
 
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private JwtTokenUtil jwtUtil;
+
+	@Autowired
+	private UserConverter userConverter;
 
 	@GetMapping(value = "/test")
 	public String testEndpoint() {
@@ -51,7 +52,7 @@ public class AuthorizationController extends BaseController {
 
 		LOGGER.info("inside AuthorizationController for signUp endpoint");
 		User userDetails = userService.save(user);
-		return jwtUtil.createJWT(userDetails.getUserId().toString(), userDetails.getUserName(), "ADMIN", System.currentTimeMillis());
+		return jwtUtil.generateToken(userConverter.convert(userDetails));
 
 	}
 

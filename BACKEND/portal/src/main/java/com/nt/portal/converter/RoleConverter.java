@@ -33,4 +33,19 @@ public class RoleConverter {
 
 		return roleDto;
 	}
+
+	public Role populate(RoleDto roleDto) {
+		LOGGER.info("inside UserConverter to convert UserModel to UserDto");
+		Role role = null;
+
+		if (null != roleDto) {
+
+			role = new Role();
+			role.setRoleName(roleDto.getRoleName());
+			role.setRoleDescription((null != roleDto.getRoleDescription() ? roleDto.getRoleDescription() : ""));
+			/*role.setRoleId(roleDto.getRoleId());*/
+		}
+
+		return role;
+	}
 }

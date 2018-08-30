@@ -11,8 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.stereotype.Component;
+
+import com.nt.portal.dto.UserDto;
+import com.nt.portal.dto.common.Constants;
 
 /**
  * Class for JWT Authentication Filter
@@ -38,23 +42,23 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException, IOException, ServletException {
 
-		String header = request.getHeader("Authorisation");
+		String header = request.getHeader(Constants.AUTHORIZATION_HEADER);
 
-		if (header == null || !header.startsWith("Bearer ")) {
+		if (header == null || !header.startsWith(Constants.TOKEN_PREFIX)) {
 			throw new RuntimeException("JWT Token is missing");
 		}
 
 		String authenticationToken = header.substring(6);
 
-		JwtAuthenticationToken token = new JwtAuthenticationToken(authenticationToken);
-		return getAuthenticationManager().authenticate(token);
+		UserDto userDetails = new UserDto(authenticationToken);
+
+		return getAuthenticationManager().authenticate(userDetails);
 	}
 
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		super.successfulAuthentication(request, response, chain, authResult);
+		SecurityContextHolder.getContext().setAuthentication(authResult);
 		chain.doFilter(request, response);
 	}
 

@@ -1,19 +1,23 @@
 package com.nt.portal.services.impl;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.nt.portal.converter.RoleConverter;
 import com.nt.portal.converter.UserConverter;
 import com.nt.portal.dao.UserDao;
+import com.nt.portal.dto.RoleDto;
 import com.nt.portal.dto.UserDto;
+import com.nt.portal.model.Role;
 import com.nt.portal.model.User;
 import com.nt.portal.services.UserService;
 
@@ -38,6 +42,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 	@Autowired
 	private UserConverter userConverter;
+	
+	@Autowired
+	private RoleConverter roleConverter;
 
 	public List<User> findAll() {
 		List<User> list = new ArrayList<>();
@@ -70,6 +77,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		newUser.setPassword(user.getPassword());
 		/* newUser.setPassword(bcryptEncoder.encode(user.getPassword())); */
 		newUser.setEmail(user.getEmail());
+		Set<Role> roles = new LinkedHashSet<Role>();
+		for(RoleDto roleDto:user.getRoles()){
+			roles.add(roleConverter.populate(roleDto));
+		}
+		newUser.setRoles(roles);
 		return userDao.save(newUser);
 	}
 
@@ -77,7 +89,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	 * Spring Security method to load user by userName
 	 */
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDto loadUserByUsername(String username) throws UsernameNotFoundException {
 		LOGGER.info("inside UserServiceImpl cmethod loadUserByUsername for username : {}", username);
 		User user = userDao.findByuserName(username);
 		if (null == user) {

@@ -1,12 +1,13 @@
 package com.nt.portal.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,17 +19,24 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @version 1.0
  *
  */
-public class UserDto implements Serializable, UserDetails {
+public class UserDto extends UsernamePasswordAuthenticationToken implements Serializable, UserDetails {
 
 	public UserDto() {
+		super(null, null);
 	}
 
-	public UserDto(String userName, long id, String token, List<GrantedAuthority> grantedAuthorities) {
+	public UserDto(String token) {
+		super(null, null);
+		this.token = token;
+	}
 
+	public UserDto(String userName, long id, String token, String password, List<GrantedAuthority> grantedAuthorities) {
+		super(userName, password, grantedAuthorities);
 		this.userName = userName;
 		this.id = id;
 		this.token = token;
-		/* getAuthorities(); */
+		this.password = password;
+		this.authorities = grantedAuthorities;
 	}
 
 	/**
@@ -48,6 +56,7 @@ public class UserDto implements Serializable, UserDetails {
 	private Set<RoleDto> roles;
 	private Long id;
 	private String token;
+	private List<GrantedAuthority> authorities;
 
 	/**
 	 * @return the firstName
@@ -230,44 +239,53 @@ public class UserDto implements Serializable, UserDetails {
 	}
 
 	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-		this.roles.forEach(role -> {
-			authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
-			authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
-		});
-		return authorities;
+	public Collection<GrantedAuthority> getAuthorities() {
+		List<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+		if (null != roles) {
+			for (RoleDto roleDTo : roles) {
+				grantedAuthorities.add(new SimpleGrantedAuthority(roleDTo.getRoleName()));
+				grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + roleDTo.getRoleName()));
+			}
+		}
+		this.authorities = grantedAuthorities;
+		return this.authorities;
+
 		/* return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")); */
+	}
+
+	public Collection<GrantedAuthority> setAuthorities(List<RoleDto> roles) {
+		List<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+		for (RoleDto roleDTo : roles) {
+			grantedAuthorities.add(new SimpleGrantedAuthority(roleDTo.getRoleName()));
+			grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + roleDTo.getRoleName()));
+		}
+		this.authorities = grantedAuthorities;
+		return this.authorities;
 	}
 
 	@Override
 	public String getUsername() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.userName;
 	}
 
 	@Override
 	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }

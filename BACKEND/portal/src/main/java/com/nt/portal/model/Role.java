@@ -1,10 +1,14 @@
 package com.nt.portal.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -30,6 +34,9 @@ public class Role {
 
 	@Column(name = "ROLE_DESCRITION")
 	private String roleDescription;
+
+	/*@ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+	private List<User> users;*/
 
 	/**
 	 * @return the roleId
@@ -75,5 +82,20 @@ public class Role {
 	public void setRoleDescription(String roleDescription) {
 		this.roleDescription = roleDescription;
 	}
+
+	/**
+	 * @return the users
+	 *//*
+	public List<User> getUsers() {
+		return users;
+	}
+
+	*//**
+	 * @param users
+	 *            the users to set
+	 *//*
+	public void setUsers(List<User> users) {
+		this.users = users;
+	}*/
 
 }
